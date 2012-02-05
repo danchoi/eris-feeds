@@ -1,0 +1,30 @@
+create table blogs (
+  blog_id serial primary key,
+  html_url varchar unique, 
+  title varchar,
+  feed_url varchar
+);
+
+create table blog_posts (
+  blog_post_id serial primary key,
+  blog_id integer references blogs on delete cascade,
+  blog varchar,
+  feed_url varchar, 
+  blog_post_href varchar unique,
+  title varchar,
+  author varchar,
+  date timestamp,
+  inserted_at timestamp default now(),
+  img varchar,
+  summary text
+);
+create index blog_post_date_idx  on blgo_posts (date);
+
+create table images (
+  blog_post_id integer references blog_posts on delete cascade,
+  src varchar unique,
+  filename varchar,  -- save under dir named after the blog_id
+  inserted_at timestamp default now(),
+  width integer,
+  height integer
+);
