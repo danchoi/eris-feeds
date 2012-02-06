@@ -2,7 +2,9 @@
 
 require 'nokogiri'
 require 'feed_yamlizer'
-require 'db'
+require 'sequel'
+
+DB = Sequel.connect "postgres:///erisfeeds"
 
 feeds = CONFIG['feeds']
 feeds.each {|f|

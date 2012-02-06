@@ -1,0 +1,52 @@
+create table applications (
+  app_id serial primary key,
+  app_name varchar,
+  callback_url varchar
+);
+create table feeds (
+  feed_id serial primary key,
+  title varchar,
+  html_url varchar unique, 
+  xml_url varchar
+);
+create table subscriptions (
+  app_id integer references applications,
+  feed_id integer references feeds,
+  created timestamp default now(),
+  last_crawl timestamp,
+  unique (app_id, feed_id)
+);
+create table items (
+  item_id serial primary key,
+  feed_id integer references feeds on delete cascade,
+  feed varchar,
+  feed_xml_url varchar, 
+  feed_post_href varchar unique,
+  title varchar,
+  author varchar,
+  date timestamp,
+  crawled timestamp default now(),
+  img varchar,
+  summary text
+);
+create index item_item_id_idx  on items (date);
+
+create table images (
+  item_id integer references items on delete cascade,
+  src varchar unique,
+  filename varchar,  -- save under dir named after the feed_id
+  inserted_at timestamp default now(),
+  width integer,
+  height integer
+);
+
+create table sources (
+  source_id serial primary key,
+  consumer_id integer references consumers,
+  owner varchar not null,           -- twitter list owner
+  list_slug varchar not null,       -- twitter list slug
+  created timestamp default now(),
+  last_crawl timestamp,
+  unique (source_id, consumer_id),
+  unique (owner, list_slug)
+);
