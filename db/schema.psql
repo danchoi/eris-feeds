@@ -42,11 +42,11 @@ create table images (
 
 create table sources (
   source_id serial primary key,
-  consumer_id integer references consumers,
+  app_id integer references applications,
   owner varchar not null,           -- twitter list owner
   list_slug varchar not null,       -- twitter list slug
   created timestamp default now(),
   last_crawl timestamp,
-  unique (source_id, consumer_id),
+  unique (source_id, app_id),
   unique (owner, list_slug)
 );
