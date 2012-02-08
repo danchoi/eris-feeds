@@ -48,7 +48,7 @@ class Crawl
         if DB[:items].first item_href: item_params[:item_href]
           $stderr.print '.'
         else
-          puts "Inserting item => #{item_params[:title]} (feed #{feed_id}"
+          puts "Inserting item => #{item_params[:title]} (feed #{feed_id})"
           item = FeedItem.new(DB[:items].insert(item_params))
           item.create_summary_and_images 
         end
