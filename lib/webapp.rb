@@ -23,6 +23,8 @@ class FeedService < Sinatra::Base
     DB[:applications].all.to_a.to_json
   }
 
+  # representation includes subscription list
+  # TODO hypermedia link to self, subscriptions, crawls
   get('/application/:id') {|app_id|
     # TODO put the items count per feed
     subscriptions = DB["select feeds.title, feeds.xml_url, feeds.html_url, 
