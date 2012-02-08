@@ -3,6 +3,7 @@
 require 'nokogiri'
 require 'feed_yamlizer'
 require 'db'
+require 'feed_item'
 
 class Crawl
   def initialize(app_id)
@@ -48,50 +49,15 @@ class Crawl
           $stderr.print '.'
         else
           puts "Inserting item => #{item_params[:title]} (feed #{feed_id}"
-          item_id = DB[:items].insert item_params
-          create_summary_and_images item_id
+          item = FeedItem.new(DB[:items].insert(item_params))
+          item.create_summary_and_images 
         end
       }    
     }
   end
 
-  def create_summary_and_images(item_id)
-    html = DB[:items].first(item_id:item_id)[:original_content]
-    n = nil 
-    summary = if html 
-      html = html.force_encoding("UTF-8")
-      n = Nokogiri::HTML(html).xpath('/')
-      if n
-        # TODO fix this so words are not mashed together
-        words = n.inner_text[0,355].split(/\s/)
-        words[0..-2].join(' ') + '...' 
-      end
-    end
-    if summary
-      DB[:items].filter(item_id:item_id).update(summary:summary)
-    end
-    insert_images item_id, n
-  end
 
-  def insert_images item_id, n   # n is a Nokogiri node
-    if n
-      n.search("img").select {|img| 
-        img[:height] != '1' &&
-        img[:width] != '1' &&
-        img[:alt] !~ /^Add to/ && 
-        !DB[:images].first(src:img[:src]) 
-      }.each {|img|
-        filename = img[:src][/[^\/?#]+.(jpg|jpeg|git|png)/i,0]
-        next unless filename
-        params = {
-          item_id:item_id,
-          src:img[:src],
-          filename:filename
-        }
-        DB[:images].insert params
-      }
-    end
-  end
+
 end
 
 if __FILE__ == $0

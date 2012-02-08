@@ -32,8 +32,9 @@ create table items (
 );
 create index item_item_id_idx  on items (date);
 create table images (
+  image_id serial primary key,
   item_id integer references items on delete cascade,
-  src varchar unique,
+  src varchar,
   filename varchar,  -- save under dir named after the feed_id
   inserted_at timestamp default now(),
   width integer,
