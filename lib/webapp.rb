@@ -16,6 +16,23 @@ class FeedService < Sinatra::Base
   }
 
   get('/application/:app_id/items') {|app_id|
+
+    items = DB["select 
+      items.item_id,
+      items.title, 
+      items.date,
+      items.item_href,
+      items.summary,
+      feeds.title as feed_title, 
+      feeds.xml_url as feed_xml_url, 
+      feeds.html_url as feed_html_url, 
+      feed_id
+      from subscriptions 
+        inner join feeds using (feed_id)
+        inner join items using (feed_id)
+      "].filter(app_id:app_id).to_a
+    items.to_json
+
   }
 
   get('/applications') {
@@ -25,8 +42,9 @@ class FeedService < Sinatra::Base
 
   # representation includes subscription list
   # TODO hypermedia link to self, subscriptions, crawls
+
   get('/application/:id') {|app_id|
-    # TODO put the items count per feed
+
     subscriptions = DB["select feeds.title, feeds.xml_url, feeds.html_url, 
       feed_id, feeds.updated from subscriptions 
       inner join feeds using (feed_id)"].filter(app_id:app_id).to_a

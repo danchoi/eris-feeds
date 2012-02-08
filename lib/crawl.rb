@@ -17,6 +17,7 @@ class Crawl
   def crawl
     # TODO concurrent
     feeds.each {|feed|
+      DB[:feeds].filter(feed_id:feed[:feed_id]).update(updated:Time.now)
       xml_url = feed[:xml_url]
       cmd = "curl -Ls '#{xml_url}' | feed2yaml"
       feedyml = `#{cmd}`
@@ -53,7 +54,6 @@ class Crawl
           item.create_summary_and_images 
         end
       }
-      DB[:feeds].filter(feed_id:feed[:feed_id]).update(updated:Time.now)
     }
   end
 
