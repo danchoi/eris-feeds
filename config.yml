@@ -1,2 +1,2 @@
-default:
+development:
   database: postgres:///erisfeeds

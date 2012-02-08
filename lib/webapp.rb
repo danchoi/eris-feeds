@@ -19,7 +19,17 @@ class FeedService < Sinatra::Base
   }
 
   get('/applications') {
+    # TODO include hypermedia links
     DB[:applications].all.to_a.to_json
+  }
+
+  get('/application/:id') {|app_id|
+    # TODO put the items count per feed
+    subscriptions = DB["select feeds.title, feeds.xml_url, feeds.html_url, 
+      feed_id, last_crawl from subscriptions 
+      inner join feeds using (feed_id)"].filter(app_id:app_id).to_a
+    DB[:applications].first(app_id:app_id).to_hash.
+      merge(subscriptions:subscriptions).to_json
   }
 
   post('/applications') {
@@ -47,6 +57,20 @@ class FeedService < Sinatra::Base
     application = ds.first.to_hash
     ds.delete
     application.to_json
+  }
+
+  # payload must contain feed_xml_url 
+  post('/application/:app_id/subscriptions') {|app_id|
+    feed_xml_url = JSON.parse(request.body.read)
+    sub_id = if (f = DB[:feeds].first(xml_url:feed_xml_url)) &&
+        (DB[:subscriptions].first(feed_id:f[:feed_id]).nil?)
+      DB[:subscriptions].insert(feed_id:f[:feed_id], app_id:app_id)
+    else
+      feed_id = DB[:feeds].insert(xml_url:feed_xml_url)
+      DB[:subscriptions].insert(feed_id:feed_id, app_id:app_id)
+    end
+    status 201
+    DB[:subscriptions].first(sub_id:sub_id).to_hash.to_json
   }
 
   post('/application/:app_id/crawls') {|app_id|
