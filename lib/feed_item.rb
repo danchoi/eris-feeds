@@ -46,8 +46,10 @@ class FeedItem
 
   def process_images
     puts "Processing images for item #{@item_id}"
-    DB[:images].filter(item_id:@item_id).order(:inserted_at.asc).map {|image|
-
+    DB[:images].filter(item_id:@item_id).order(:inserted_at.asc).map.with_index {|image, idx|
+      if idx == 0
+        DB[:items].filter(item_id:image[:item_id]).update(featured_image_id:image[:image_id])
+      end
       dir = "img/#{@item_id}"
       path = "#{dir}/#{image[:filename]}"
       unless File.exist?(path)

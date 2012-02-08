@@ -23,6 +23,7 @@ class FeedService < Sinatra::Base
       items.date,
       items.item_href,
       items.summary,
+      images.filename as image_file,
       feeds.title as feed_title, 
       feeds.xml_url as feed_xml_url, 
       feeds.html_url as feed_html_url, 
@@ -30,6 +31,7 @@ class FeedService < Sinatra::Base
       from subscriptions 
         inner join feeds using (feed_id)
         inner join items using (feed_id)
+        left outer join images on items.featured_image_id = images.image_id
       "].filter(app_id:app_id).to_a
     items.to_json
 

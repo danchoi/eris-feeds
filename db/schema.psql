@@ -25,7 +25,7 @@ create table items (
   author varchar,
   date timestamp,
   crawled timestamp default now(),
-  img varchar,
+  featured_image_id integer, -- featured image
   summary text,
   original_content text
 );
@@ -39,6 +39,9 @@ create table images (
   width integer,
   height integer
 );
+
+alter table items add constraint items_featured_images_constraint foreign key (featured_image_id) references images (image_id);
+
 create table crawls (
   crawl_id serial primary key,
   app_id integer references applications,
