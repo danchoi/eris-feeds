@@ -15,7 +15,6 @@ create table subscriptions (
   app_id integer references applications,
   feed_id integer references feeds,
   created timestamp default now(),
-  last_crawl timestamp,
   unique (app_id, feed_id)
 );
 create table items (

@@ -28,7 +28,7 @@ class FeedService < Sinatra::Base
   get('/application/:id') {|app_id|
     # TODO put the items count per feed
     subscriptions = DB["select feeds.title, feeds.xml_url, feeds.html_url, 
-      feed_id, last_crawl from subscriptions 
+      feed_id, feeds.updated from subscriptions 
       inner join feeds using (feed_id)"].filter(app_id:app_id).to_a
     DB[:applications].first(app_id:app_id).to_hash.
       merge(subscriptions:subscriptions).to_json
