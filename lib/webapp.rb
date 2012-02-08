@@ -84,6 +84,13 @@ class FeedService < Sinatra::Base
       to_json
   }
 
+  get('/application/:app_id/crawls') {|app_id|
+    { 
+      app_id: app_id,
+      crawls: DB[:crawls].filter(app_id:app_id).to_a 
+    }.to_json
+  }
+
   get('/crawls/:id') {|crawl_id|
     DB[:crawls].first(crawl_id:crawl_id).to_hash.to_json
   }
