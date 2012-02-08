@@ -1,13 +1,14 @@
 # fetches and processes feeds
-
 require 'nokogiri'
 require 'feed_yamlizer'
 require 'db'
 require 'feed_item'
 
 class Crawl
-  def initialize(app_id)
-    @app_id = app_id
+  def initialize(crawl_id)
+    @crawl_id = crawl_id
+    @crawl = DB[:crawls].first(crawl_id:crawl_id)
+    @app_id = @crawl[:app_id]
   end
 
   def feeds
@@ -16,10 +17,12 @@ class Crawl
 
   def crawl
     # TODO concurrent
+    DB[:crawls].filter(crawl_id:@crawl_id).update(started:Time.now)
     feeds.each {|feed|
+      puts "Updating feed: #{feed[:feed_id]} #{feed[:xml_url]}"
       DB[:feeds].filter(feed_id:feed[:feed_id]).update(updated:Time.now)
       xml_url = feed[:xml_url]
-      cmd = "curl -Ls '#{xml_url}' | feed2yaml"
+      cmd = "curl -Ls -A 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3'  '#{xml_url}' | feed2yaml"
       feedyml = `#{cmd}`
       feed_yml = YAML::load feedyml
       feed_info = feed_yml[:meta]
@@ -55,12 +58,17 @@ class Crawl
         end
       }
     }
+    DB[:crawls].filter(crawl_id:@crawl_id).update(completed:Time.now)
   end
 
-
+  
 
 end
 
 if __FILE__ == $0
-  puts Crawl.new(1).crawl
+  DB[:crawls].filter(started:nil).order(:created.asc).each {|r|
+    crawl_id = r[:crawl_id]
+    puts "Starting crawl: #{crawl_id}"
+    Crawl.new(crawl_id).crawl
+  }
 end

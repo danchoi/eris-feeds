@@ -93,16 +93,16 @@ class FeedService < Sinatra::Base
 
   # payload must contain feed_xml_url 
   post('/application/:app_id/subscriptions') {|app_id|
-    feed_xml_url = JSON.parse(request.body.read)
-    sub_id = if (f = DB[:feeds].first(xml_url:feed_xml_url)) &&
-        (DB[:subscriptions].first(feed_id:f[:feed_id]).nil?)
-      DB[:subscriptions].insert(feed_id:f[:feed_id], app_id:app_id)
+    feed_xml_url = JSON.parse(request.body.read)['feed_xml_url']
+    sub_id = if (f = DB[:feeds].first(xml_url:feed_xml_url)) && (DB[:subscriptions].first(feed_id:f[:feed_id]).nil?)
+      feed_id = f[:feed_id]
+      DB[:subscriptions].insert(feed_id:feed_id, app_id:app_id)
     else
       feed_id = DB[:feeds].insert(xml_url:feed_xml_url)
       DB[:subscriptions].insert(feed_id:feed_id, app_id:app_id)
     end
     status 201
-    DB[:subscriptions].first(sub_id:sub_id).to_hash.to_json
+    DB[:subscriptions].first(app_id:app_id, feed_id:feed_id).to_hash.to_json
   }
 
   get('/application/:app_id/subscriptions') {|app_id|
