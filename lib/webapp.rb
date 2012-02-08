@@ -16,7 +16,6 @@ class FeedService < Sinatra::Base
   }
 
   get('/application/:app_id/items') {|app_id|
-
     items = DB["select 
       items.item_id,
       items.title, 
@@ -32,8 +31,10 @@ class FeedService < Sinatra::Base
         inner join feeds using (feed_id)
         inner join items using (feed_id)
         left outer join images on items.featured_image_id = images.image_id
-      "].filter(app_id:app_id).to_a
-    items.to_json
+      "].filter(app_id:app_id).
+         limit(200)
+    items = items.filter("date > ?", params[:from_time]) if params[:from_time]
+    items.to_a.to_json
 
   }
 

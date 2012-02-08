@@ -13,7 +13,7 @@ class FeedItem
       n = Nokogiri::HTML(html).xpath('/')
       if n
         # TODO fix this so words are not mashed together
-        words = n.inner_text[0,355].split(/\s/)
+        words = n.inner_text.strip[0,355].split(/\s/)
         words[0..-2].join(' ') + '...' 
       end
     end
