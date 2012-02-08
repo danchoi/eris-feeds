@@ -7,7 +7,9 @@ create table feeds (
   feed_id serial primary key,
   title varchar,
   html_url varchar unique, 
-  xml_url varchar
+  xml_url varchar not null,
+  updated timestamp,
+  created timestamp default now()
 );
 create table subscriptions (
   app_id integer references applications,
@@ -38,16 +40,6 @@ create table images (
   width integer,
   height integer
 );
-create table sources (
-  source_id serial primary key,
-  app_id integer references applications,
-  owner varchar not null,           -- twitter list owner
-  list_slug varchar not null,       -- twitter list slug
-  created timestamp default now(),
-  last_crawl timestamp,
-  unique (source_id, app_id),
-  unique (owner, list_slug)
-);
 create table crawls (
   crawl_id serial primary key,
   app_id integer references applications,
@@ -55,3 +47,4 @@ create table crawls (
   started timestamp,
   completed timestamp
 );
+-- TODO pubsub notifications
