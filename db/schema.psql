@@ -21,15 +21,14 @@ create table subscriptions (
 create table items (
   item_id serial primary key,
   feed_id integer references feeds on delete cascade,
-  feed varchar,
-  feed_xml_url varchar, 
-  feed_post_href varchar unique,
+  item_href varchar unique,
   title varchar,
   author varchar,
   date timestamp,
   crawled timestamp default now(),
   img varchar,
-  summary text
+  summary text,
+  original_content text
 );
 create index item_item_id_idx  on items (date);
 create table images (
