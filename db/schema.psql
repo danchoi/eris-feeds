@@ -30,7 +30,6 @@ create table items (
   summary text
 );
 create index item_item_id_idx  on items (date);
-
 create table images (
   item_id integer references items on delete cascade,
   src varchar unique,
@@ -39,7 +38,6 @@ create table images (
   width integer,
   height integer
 );
-
 create table sources (
   source_id serial primary key,
   app_id integer references applications,
@@ -50,4 +48,10 @@ create table sources (
   unique (source_id, app_id),
   unique (owner, list_slug)
 );
-
+create table crawls (
+  crawl_id serial primary key,
+  app_id integer references applications,
+  created timestamp default now(),
+  started timestamp,
+  completed timestamp
+);
