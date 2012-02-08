@@ -37,7 +37,12 @@ class FeedService < Sinatra::Base
 
   get('/applications') {
     # TODO include hypermedia links
-    DB[:applications].all.to_a.to_json
+    apps = DB[:applications].all.to_a
+    apps.map {|app|
+      app.to_hash.merge({links: [
+        { link: url_for("/application/#{app[:app_id]}"), rel: "self"  }
+      ]})
+    }.to_json
   }
 
   # representation includes subscription list
@@ -49,7 +54,11 @@ class FeedService < Sinatra::Base
       feed_id, feeds.updated from subscriptions 
       inner join feeds using (feed_id)"].filter(app_id:app_id).to_a
     DB[:applications].first(app_id:app_id).to_hash.
-      merge(subscriptions:subscriptions).to_json
+      merge(subscriptions:subscriptions).
+        merge(links: [
+          { link:url_for("/application/#{app_id}"), rel:'self' }
+        ]).
+        to_json
   }
 
   post('/applications') {
