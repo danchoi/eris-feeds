@@ -50,3 +50,30 @@ create table crawls (
   completed timestamp
 );
 -- TODO pubsub notifications
+
+
+drop view if exists app_items;
+
+-- see Chak; view-backed model
+
+create view app_items as
+  select 
+    subscriptions.app_id as app_id,
+    items.item_id,
+    items.title, 
+    items.date,
+    items.item_href,
+    items.summary,
+    images.filename as image_file,
+    items.feed_id,
+    feeds.title as feed_title, 
+    feeds.xml_url as feed_xml_url, 
+    feeds.html_url as feed_html_url
+    from items
+  inner join feeds on feeds.feed_id = items.feed_id
+  inner join subscriptions on feeds.feed_id = subscriptions.feed_id
+  left outer join images on items.featured_image_id = images.image_id;
+
+        
+
+

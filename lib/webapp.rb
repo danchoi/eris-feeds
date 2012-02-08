@@ -16,26 +16,10 @@ class FeedService < Sinatra::Base
   }
 
   get('/application/:app_id/items') {|app_id|
-    items = DB["select 
-      items.item_id,
-      items.title, 
-      items.date,
-      items.item_href,
-      items.summary,
-      images.filename as image_file,
-      feeds.title as feed_title, 
-      feeds.xml_url as feed_xml_url, 
-      feeds.html_url as feed_html_url, 
-      feed_id
-      from subscriptions 
-        inner join feeds using (feed_id)
-        inner join items using (feed_id)
-        left outer join images on items.featured_image_id = images.image_id
-      "].filter(app_id:app_id).
-         limit(200)
+    items = DB[:app_items].filter(app_id:app_id).order(:date.desc).limit(100)
     items = items.filter("date > ?", params[:from_time]) if params[:from_time]
+    puts items.sql
     items.to_a.to_json
-
   }
 
   get('/applications') {
@@ -55,9 +39,11 @@ class FeedService < Sinatra::Base
 
     subscriptions = DB["select feeds.title, feeds.xml_url, feeds.html_url, 
       feed_id, feeds.updated from subscriptions 
-      inner join feeds using (feed_id)"].filter(app_id:app_id).to_a
+      inner join feeds using (feed_id) where subscriptions.app_id = ?", app_id]
+    puts subscriptions.sql
+
     DB[:applications].first(app_id:app_id).to_hash.
-      merge(subscriptions:subscriptions).
+      merge(subscriptions:subscriptions.to_a).
         merge(links: [
           { link:url_for("/application/#{app_id}"), rel:'self' }
         ]).
