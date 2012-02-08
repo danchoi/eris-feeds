@@ -75,6 +75,10 @@ class FeedService < Sinatra::Base
     DB[:subscriptions].first(sub_id:sub_id).to_hash.to_json
   }
 
+  get('/application/:app_id/subscriptions') {|app_id|
+
+  }
+
   post('/application/:app_id/crawls') {|app_id|
     crawl_id = DB[:crawls].insert(app_id:app_id) 
     status 201

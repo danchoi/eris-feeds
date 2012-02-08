@@ -52,7 +52,8 @@ class Crawl
           item = FeedItem.new(DB[:items].insert(item_params))
           item.create_summary_and_images 
         end
-      }    
+      }
+      DB[:feeds].filter(feed_id:feed[:feed_id]).update(last_crawl:Time.now)
     }
   end
 
