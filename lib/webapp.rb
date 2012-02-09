@@ -49,20 +49,14 @@ class FeedService < Sinatra::Base
         to_json
   }
 
-  post('/applications') {
-    payload = JSON.parse request.body.read
-    ds = DB[:applications]
-    if ds.first(app_name: payload['app_name'])
-      halt 403, "App name already taken"
-    else
-      app_id = ds.insert payload
-      ds.first(app_id:app_id).to_hash.to_json
-    end
-  }
-  
   put('/application/:id') {|app_id|   
     payload = JSON.parse request.body.read
-    DB[:applications].filter(app_id:app_id).update(payload)
+    if DB[:applications].first(app_id:app_id)
+      DB[:applications].filter(app_id:app_id).update(payload)
+    else
+      status 201
+      DB[:applications].insert(payload)
+    end
     DB[:applications].first(app_id:app_id).to_json
   }
 

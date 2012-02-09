@@ -1,5 +1,5 @@
 create table applications (
-  app_id serial primary key,
+  app_id integer primary key, -- PUT request sets app_id
   app_name varchar,
   callback_url varchar
 );
