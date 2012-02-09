@@ -1,5 +1,6 @@
 applications:
 - config:
+    app_id: 20
     app_name: bostonmusichub.com
   feeds: 
   - http://feeds.feedburner.com/exploitboston
