@@ -31,9 +31,10 @@ class FeedItem
         img[:width] != '1' &&
         img[:alt] !~ /^Add to/ && 
         !DB[:images].first(src:img[:src]) 
-      }.each {|img|
-        filename = img[:src][/[^\/?#]+.(jpg|jpeg|git|png)/i,0]
-        next unless filename
+      }.each_with_index {|img, idx|
+        ext = img[:src][/[^\/?#]+.(jpg|jpeg|gif|png)/i,1]
+        next unless ext 
+        filename = "#{idx}.#{ext}"
         params = {
           item_id:@item_id,
           src:img[:src],
