@@ -17,7 +17,9 @@ class FeedService < Sinatra::Base
 
   get('/application/:app_id/items') {|app_id|
     items = DB[:app_items].filter(app_id:app_id).order(:date.desc).limit(100)
-    items = items.filter("date > ?", params[:from_time]) if params[:from_time]
+    if params[:from_time]
+      items = items.filter("date > ?", URI.unescape(params[:from_time]))
+    end
     items.to_a.to_json
   }
 
