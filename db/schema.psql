@@ -6,7 +6,7 @@ create table applications (
 create table feeds (
   feed_id serial primary key,
   title varchar,
-  html_url varchar unique, 
+  html_url varchar, 
   xml_url varchar not null unique,
   updated timestamp,
   created timestamp default now()
