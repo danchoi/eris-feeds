@@ -79,3 +79,5 @@ create view app_subscriptions
   as select app_name, app_id, feed_id, title, xml_url 
     from subscriptions inner join feeds using (feed_id) inner join applications using (app_id);
 
+create view feed_item_counts 
+  as select feed_id, feeds.title, count(*) as items_count, feeds.xml_url from feeds inner join items using (feed_id) group by feeds.feed_id order by items_count desc;
