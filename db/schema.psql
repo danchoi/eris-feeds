@@ -75,5 +75,7 @@ create view app_items as
   left outer join images on items.featured_image_id = images.image_id;
 
         
-
+create view app_subscriptions 
+  as select app_name, app_id, feed_id, title, xml_url 
+    from subscriptions inner join feeds using (feed_id) inner join applications using (app_id);
 
