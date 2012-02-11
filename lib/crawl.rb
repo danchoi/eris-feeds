@@ -50,7 +50,9 @@ class Crawl
           title: i[:title],
           author: i[:author],
           date: i[:pub_date],
-          original_content: i[:content][:html]
+          original_content: i[:content][:html],
+          enclosure: i[:enclosure],
+          podcast_image: i[:podcast_image]
         }
         if DB[:items].first item_href: item_params[:item_href]
           $stderr.print '.'
