@@ -35,16 +35,17 @@ class FeedItem
         !DB[:images].first(src:img[:src]) 
       }.each_with_index {|img, idx|
         ext = img[:src][/[^\/?#]+.(jpg|jpeg|gif|png)/i,1]
-        if img[:src] =~ /^\//
+        src = img[:src] 
+        if src =~ /^\//
           base_url = @feed[:html_url][/^https?:\/\/[^\/]+/,0]
-          img[:src] = "#{base_url}#{img[:src]}"
-          puts "Setting img[:src] to #{img[:src]}"
+          src = "#{base_url}#{img[:src]}"
+          puts "Setting img[:src] to #{src}"
         end
-        next unless (ext  && img[:src] =~ /^http/)
+        next unless (ext  && src =~ /^http/)
         filename = "#{idx}.#{ext}"
         params = {
           item_id:@item_id,
-          src:img[:src],
+          src:src,
           filename:filename
         }
         DB[:images].insert params
