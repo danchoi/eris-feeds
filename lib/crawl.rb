@@ -22,13 +22,7 @@ class Crawl
       puts "Updating feed: #{feed[:feed_id]} #{feed[:xml_url]}"
       DB[:feeds].filter(feed_id:feed[:feed_id]).update(updated:Time.now)
       xml_url = feed[:xml_url]
-      is_gzipped = `curl -Ls -I -A 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3'  '#{xml_url}' | grep Content-Encoding` =~ /gzip/
-
       cmd = "curl -Ls -A 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3'  '#{xml_url}' "
-
-      if is_gzipped
-        cmd += " | gunzip -c "
-      end
       cmd += " | feed2yaml "
       puts cmd
 
