@@ -6,7 +6,7 @@ create table applications (
 create table feeds (
   feed_id serial primary key,
   title varchar,
-  html_url varchar unique, 
+  html_url varchar, 
   xml_url varchar not null unique,
   updated timestamp,
   created timestamp default now()
@@ -75,5 +75,13 @@ create view app_items as
   left outer join images on items.featured_image_id = images.image_id;
 
         
+create view app_subscriptions 
+  as select app_name, app_id, feed_id, title, xml_url 
+    from subscriptions inner join feeds using (feed_id) inner join applications using (app_id);
 
+create view feed_item_counts 
+  as select feed_id, max(feeds.title) as feed_title, count(*) as items_count, max(feeds.xml_url) as feed_xml_url from feeds inner join items using (feed_id) group by feeds.feed_id order by items_count desc;
+
+alter table items add column enclosure varchar ;
+alter table items add column podcast_image varchar ;
 
