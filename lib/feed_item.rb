@@ -3,6 +3,8 @@ class FeedItem
 
   def initialize(item_id)
     @item_id = item_id
+    @item = DB[:items].first(item_id:@item_id)
+    @feed = DB[:feeds].first(feed_id:@item[:feed_id])
   end
 
   def create_summary_and_images
@@ -33,6 +35,11 @@ class FeedItem
         !DB[:images].first(src:img[:src]) 
       }.each_with_index {|img, idx|
         ext = img[:src][/[^\/?#]+.(jpg|jpeg|gif|png)/i,1]
+        if img[:src] =~ /^\//
+          base_url = @feed[:html_url][/^https?:\/\/[^\/]+/,0]
+          img[:src] = "#{base_url}#{img[:src]}"
+          puts "Setting img[:src] to #{img[:src]}"
+        end
         next unless (ext  && img[:src] =~ /^http/)
         filename = "#{idx}.#{ext}"
         params = {
