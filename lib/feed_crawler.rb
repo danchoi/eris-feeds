@@ -1,4 +1,5 @@
 require 'feed_item'
+require 'nokogiri'
 
 class FeedCrawler
   attr_accessor :feed
