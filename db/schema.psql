@@ -65,6 +65,8 @@ create view app_items as
     items.item_href,
     items.summary,
     images.filename as image_file,
+    items.podcast_image,
+    items.enclosure,
     items.feed_id,
     feeds.title as feed_title, 
     feeds.xml_url as feed_xml_url, 
