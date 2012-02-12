@@ -5,23 +5,15 @@ class FeedItem
     @item_id = item_id
   end
 
-  def create_summary_and_images
+  def create_images
     html = DB[:items].first(item_id:@item_id)[:original_content]
     n = nil 
-    summary = if html 
+    if html 
       html = html.force_encoding("UTF-8")
       n = Nokogiri::HTML(html).xpath('/')
-      if n
-        # TODO fix this so words are not mashed together
-        words = n.inner_text.strip[0,355].split(/\s/)
-        words[0..-2].join(' ') + '...' 
-      end
+      insert_images n
+      process_images
     end
-    if summary
-      DB[:items].filter(item_id:@item_id).update(summary:summary)
-    end
-    insert_images n
-    process_images
   end
 
   def insert_images n   # n is a Nokogiri node

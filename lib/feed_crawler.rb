@@ -1,3 +1,4 @@
+require 'nokogiri'
 require 'feed_item'
 
 class FeedCrawler
@@ -33,6 +34,9 @@ class FeedCrawler
         puts "No pub date! Rejecting"
         next
       end
+      summary = i[:content][:text]
+      words = summary[0,355].split(/\s/)
+      summary = words[0..-2].join(' ') + '...' 
       item_params = { 
         feed_id: feed_id,
         item_href: i[:link],
@@ -40,6 +44,7 @@ class FeedCrawler
         author: i[:author],
         date: i[:pub_date],
         original_content: i[:content][:html],
+        summary: summary,
         enclosure: i[:enclosure],
         podcast_image: i[:podcast_image]
       }
@@ -48,7 +53,7 @@ class FeedCrawler
       else
         puts "Inserting item => #{item_params[:title]} (feed #{feed_id})"
         item = FeedItem.new(DB[:items].insert(item_params))
-        item.create_summary_and_images 
+        item.create_images 
       end
     }
   end
