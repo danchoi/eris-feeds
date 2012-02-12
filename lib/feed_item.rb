@@ -14,7 +14,10 @@ class FeedItem
       html = html.force_encoding("UTF-8")
       n = Nokogiri::HTML(html).xpath('/')
       if n
-        # TODO fix this so words are not mashed together
+        # fix this so words are not mashed together
+        n.xpath("//text()").each {|s|
+          s.content = " #{s.content }"
+        }
         words = n.inner_text.strip[0,355].split(/\s/)
         words[0..-2].join(' ') + '...' 
       end
