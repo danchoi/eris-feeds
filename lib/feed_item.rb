@@ -9,21 +9,23 @@ class FeedItem
 
   def create_summary_and_images
     html = DB[:items].first(item_id:@item_id)[:original_content]
-    n = nil 
+    n, word_count = nil, nil
     summary = if html 
       html = html.force_encoding("UTF-8")
       n = Nokogiri::HTML(html).xpath('/')
       if n
         # fix this so words are not mashed together
         n.xpath("//text()").each {|s|
-          s.content = " #{s.content }"
+          s.content = " #{s.content} "
         }
-        words = n.inner_text.strip[0,355].split(/\s/)
+        # store word count
+        word_count = n.inner_text.split(/\s+/).size
+        words = n.inner_text.strip[0,355].split(/\s+/)
         words[0..-2].join(' ') + '...' 
       end
     end
     if summary
-      DB[:items].filter(item_id:@item_id).update(summary:summary)
+      DB[:items].filter(item_id:@item_id).update(summary:summary, word_count:word_count)
     end
     insert_images n
     process_images
