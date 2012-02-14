@@ -66,7 +66,7 @@ class FeedItem
       end
       dir = "img/#{@item_id}"
       path = "#{dir}/#{image[:filename]}"
-      unless File.exist?(path)
+      unless File.size?(path)
         run "mkdir -p #{dir}"
         run "wget -O #{path} '#{image[:src]}'"
         run "convert #{path} -resize '200x150>' #{path}.tmp"
