@@ -33,27 +33,30 @@ class FeedItem
 
   def insert_images n   # n is a Nokogiri node
     if n
-      n.search("img").select {|img| 
-        img[:height] != '1' &&
-        img[:width] != '1' &&
-        img[:alt] !~ /^Add to/ && 
-        !DB[:images].first(src:img[:src]) 
+      n.search("img").
       }.each_with_index {|img, idx|
-        ext = img[:src][/[^\/?#]+.(jpg|jpeg|gif|png)/i,1]
-        src = img[:src] 
-        if src =~ /^\//
-          base_url = @feed[:html_url][/^https?:\/\/[^\/]+/,0]
-          src = "#{base_url}#{img[:src]}"
-          puts "Setting img[:src] to #{src}"
+        if img[:height] != '1' &&
+          img[:width] != '1' && img[:alt] !~ /^Add to/ && 
+          !DB[:images].first(src:img[:src]) && img[:src] !~ /placeholder/
+
+          ext = img[:src][/[^\/?#]+.(jpg|jpeg|gif|png)/i,1]
+          src = img[:src] 
+          if src =~ /^\//
+            base_url = @feed[:html_url][/^https?:\/\/[^\/]+/,0]
+            src = "#{base_url}#{img[:src]}"
+            puts "Setting img[:src] to #{src}"
+          end
+          next unless (ext  && src =~ /^http/)
+          filename = "#{idx}.#{ext}"
+          params = {
+            item_id:@item_id,
+            src:src,
+            filename:filename
+          }
+          DB[:images].insert params
+        else
+          img.remove
         end
-        next unless (ext  && src =~ /^http/)
-        filename = "#{idx}.#{ext}"
-        params = {
-          item_id:@item_id,
-          src:src,
-          filename:filename
-        }
-        DB[:images].insert params
       }
     end
   end
