@@ -61,9 +61,6 @@ class FeedItem
   def process_images
     puts "Processing images for item #{@item_id}"
     DB[:images].filter(item_id:@item_id).order(:inserted_at.asc).map.with_index {|image, idx|
-      if idx == 0
-        DB[:items].filter(item_id:image[:item_id]).update(featured_image_id:image[:image_id])
-      end
       dir = "img/#{@item_id}"
       path = "#{dir}/#{image[:filename]}"
       unless File.size?(path)
@@ -74,6 +71,9 @@ class FeedItem
         /(?<width>\d+)x(?<height>\d+) / =~ run("identify #{path}")
         puts "Image dimensions: #{width}image#{height}"
         DB[:images].filter(image_id:image[:image_id]).update(width:width, height:height)
+      end
+      if idx == 0 && File.size?(path)
+        DB[:items].filter(item_id:image[:item_id]).update(featured_image_id:image[:image_id])
       end
     }
   end
