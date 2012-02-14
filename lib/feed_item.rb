@@ -33,8 +33,7 @@ class FeedItem
 
   def insert_images n   # n is a Nokogiri node
     if n
-      n.search("img").
-      }.each_with_index {|img, idx|
+      n.search("img").each_with_index {|img, idx|
         if img[:height] != '1' &&
           img[:width] != '1' && img[:alt] !~ /^Add to/ && 
           !DB[:images].first(src:img[:src]) && img[:src] !~ /placeholder/
