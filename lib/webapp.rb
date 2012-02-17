@@ -78,9 +78,11 @@ class FeedService < Sinatra::Base
     sub_id = if (f = DB[:feeds].first(xml_url:feed_xml_url)) && (DB[:subscriptions].first(feed_id:f[:feed_id]).nil?)
       feed_id = f[:feed_id]
       DB[:subscriptions].insert(feed_id:feed_id, app_id:app_id)
-    else
+    elsif DB[:feeds].first(xml_url:feed_xml_url).nil?
       feed_id = DB[:feeds].insert(xml_url:feed_xml_url)
       DB[:subscriptions].insert(feed_id:feed_id, app_id:app_id)
+    else
+      halt 403
     end
     status 201
     DB[:subscriptions].first(app_id:app_id, feed_id:feed_id).to_hash.to_json
